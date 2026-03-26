@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gallery - نعم</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #1a1a1a;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    h1 {
+      color: #667eea;
+      font-size: 36px;
+    }
+    button {
+      padding: 12px 30px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    .btn-home {
+      background: #764ba2;
+      color: white;
+    }
+    .btn-home:hover {
+      background: #653a8a;
+    }
+    .btn-camera {
+      background: #667eea;
+      color: white;
+    }
+    .btn-camera:hover {
+      background: #5568d3;
+    }
+    .auth-section {
+      background: #222;
+      border: 2px solid #667eea;
+      border-radius: 15px;
+      padding: 30px;
+      max-width: 500px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .auth-section h2 {
+      color: #667eea;
+      margin-bottom: 20px;
+    }
+    .auth-section input {
+      width: 100%;
+      padding: 12px;
+      background: #333;
+      border: 1px solid #667eea;
+      color: #fff;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+    .auth-section input:focus {
+      outline: none;
+      box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+    }
+    .auth-section button {
+      width: 100%;
+      background: #667eea;
+      color: white;
+    }
+    .auth-section button:hover {
+      background: #5568d3;
+    }
+    .error {
+      color: #ff6b6b;
+      margin-top: 10px;
+    }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+    .photo-card {
+      background: #222;
+      border: 1px solid #667eea;
+      border-radius: 10px;
+      overflow: hidden;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    .photo-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+    .photo-card img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      display: block;
+    }
+    .photo-info {
+      padding: 15px;
+      text-align: center;
+      font-size: 12px;
+      color: #999;
+    }
+    .empty {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📁 نعم Gallery</h1>
+      <div>
+        <button class="btn-camera" onclick="goToCamera()">📷 Camera</button>
+        <button class="btn-home" onclick="goHome()">🏠 Home</button>
+      </div>
+    </div>
+
+    <div id="authSection" class="auth-section">
+      <h2>🔐 Enter Code</h2>
+      <input type="password" id="codeInput" placeholder="Enter gallery code" onkeypress="handleKeypress(event)">
+      <button onclick="authenticate()">Unlock Gallery</button>
+      <div id="errorMsg" class="error"></div>
+    </div>
+
+    <div id="gallerySection" style="display: none;">
+      <div id="gallery" class="gallery"></div>
+      <div id="emptyMsg" class="empty" style="display: none;">No photos yet</div>
+    </div>
+  </div>
+
+  <script>
+    const SECRET_CODE = '777';
+
+    function authenticate() {
+      const code = document.getElementById('codeInput').value;
+      const errorMsg = document.getElementById('errorMsg');
+
+      if (code !== SECRET_CODE) {
+        errorMsg.textContent = '✗ Incorrect code';
+        return;
+      }
+
+      document.getElementById('authSection').style.display = 'none';
+      document.getElementById('gallerySection').style.display = 'block';
+      loadPhotos();
+    }
+
+    function handleKeypress(event) {
+      if (event.key === 'Enter') {
+        authenticate();
+      }
+    }
+
+    function loadPhotos() {
+      fetch(`/api/photos?code=${SECRET_CODE}`)
+        .then(res => res.json())
+        .then(photos => {
+          const gallery = document.getElementById('gallery');
+          const emptyMsg = document.getElementById('emptyMsg');
+
+          gallery.innerHTML = '';
+
+          if (photos.length === 0) {
+            emptyMsg.style.display = 'block';
+            return;
+          }
+
+          emptyMsg.style.display = 'none';
+          photos.forEach(photo => {
+            const date = new Date(photo.date).toLocaleString();
+            const card = document.createElement('div');
+            card.className = 'photo-card';
+            card.innerHTML = `
+              <img src="${photo.url}" alt="Photo" onclick="openPhoto('${photo.url}')">
+              <div class="photo-info">${date}</div>
+            `;
+            gallery.appendChild(card);
+          });
+        })
+        .catch(err => {
+          console.error('Error loading photos:', err);
+        });
+    }
+
+    function openPhoto(url) {
+      window.open(url, '_blank');
+    }
+
+    function goToCamera() {
+      window.location.href = '/camera';
+    }
+
+    function goHome() {
+      window.location.href = '/';
+    }
+
+    // Auto-focus password input
+    window.addEventListener('load', () => {
+      document.getElementById('codeInput').focus();
+    });
+  </script>
+</body>
+</html>

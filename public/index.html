@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نعم</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .yes-button {
+      font-size: 120px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      opacity: 0.8;
+    }
+    .yes-button:hover {
+      transform: scale(1.2);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <button class="yes-button" onclick="goToCamera()">نعم</button>
+
+  <script>
+    function goToCamera() {
+      window.location.href = '/camera';
+    }
+  </script>
+</body>
+</html>
